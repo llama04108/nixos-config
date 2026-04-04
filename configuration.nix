@@ -141,6 +141,7 @@
     wget
     nano
     neovim
+    git                 # version control — configured via Home Manager below
     fastfetch
     nextdns             # DNS CLI — needed for 'nextdns status' and manual control
     pciutils            # lspci — useful for hardware debugging
@@ -198,7 +199,7 @@
     yabridgectl         # CLI tool to manage yabridge
 
     # 3D / Design / Creative
-    blender             # 3D creation — GPU rendering via HIP enabled by ROCm symlink above
+    pkgsRocm.blender    # 3D creation — built with ROCm/HIP support for RX 7800 XT GPU rendering
     gimp                # Image editor
     krita               # Digital painting and illustration
     freecad             # Parametric 3D CAD modeller
@@ -261,14 +262,37 @@
     };
 
     # ── Git ─────────────────────────────────────────────────────────────
-    # Fixed: userName/userEmail renamed to settings.user.name/email
     programs.git = {
       enable = true;
       settings.user = {
         name  = "Matthew";
         email = "matthew@kith.us";
       };
+      settings.core = {
+        editor   = "neovim";  # Use neovim for commit messages
+        autocrlf = "input";   # Handle line endings correctly on Linux
+      };
+      settings.init = {
+        defaultBranch = "main";
+      };
+      settings.pull = {
+        rebase = false;       # Merge instead of rebase on pull
+      };
     };
+
+    # ── SSH ─────────────────────────────────────────────────────────────
+    # Automatically add SSH keys to agent on first use — no manual
+    # ssh-add needed after login.
+    programs.ssh = {
+      enable                = true;
+      enableDefaultConfig   = false;
+      matchBlocks."*" = {
+        addKeysToAgent = "yes";
+      };
+    };
+
+    # Start SSH agent automatically on login.
+    services.ssh-agent.enable = true;
 
     # ── XDG Directories ─────────────────────────────────────────────────
     # Fixed: setSessionVariables = true silences the stateVersion warning
