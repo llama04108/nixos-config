@@ -120,6 +120,9 @@
     variant = "";
   };
 
+  # Disable mouse acceleration — flat profile gives 1:1 movement.
+  services.libinput.mouse.accelProfile = "flat";
+
   # ── Users ─────────────────────────────────────────────────────────────
   users.users.matthew = {
     isNormalUser = true;
@@ -154,7 +157,6 @@
 
     # Browsers
     librewolf
-    chromium
 
     # Gaming
     mangohud            # FPS/GPU/CPU overlay
@@ -244,7 +246,9 @@
   home-manager.useGlobalPkgs   = true;  # Use system nixpkgs
   home-manager.useUserPackages = true;  # Install packages to user profile
 
-  home-manager.users.matthew = { pkgs, ... }: {
+  home-manager.users.matthew = { pkgs, cosmicLib, ... }: {
+    imports = [ <cosmic-manager/modules> ];
+
     home.stateVersion = "25.11";
 
     # ── Shell ───────────────────────────────────────────────────────────
@@ -256,17 +260,100 @@
         rebuild = "sudo nixos-rebuild switch";
         update  = "sudo nixos-rebuild switch --upgrade";
       };
-      # Run fastfetch on every new terminal session.
       initExtra = ''
         fastfetch
       '';
+    };
+
+    # ── Starship prompt ─────────────────────────────────────────────────
+    # Single-line prompt using Tokyo Night Night colors.
+    programs.starship = {
+      enable = true;
+      settings = {
+        palette = "tokyonight_night";
+        palettes.tokyonight_night = {
+          bg         = "#1a1b26";
+          bg_dark    = "#16161e";
+          bg_highlight = "#292e42";
+          blue       = "#7aa2f7";
+          blue0      = "#3d59a1";
+          blue1      = "#2ac3de";
+          blue2      = "#0db9d7";
+          blue5      = "#89ddff";
+          blue6      = "#b4f9f8";
+          blue7      = "#394b70";
+          comment    = "#565f89";
+          cyan       = "#7dcfff";
+          dark3      = "#545c7e";
+          dark5      = "#737aa2";
+          fg         = "#c0caf5";
+          fg_dark    = "#a9b1d6";
+          fg_gutter  = "#3b4261";
+          green      = "#9ece6a";
+          green1     = "#73daca";
+          green2     = "#41a6b5";
+          magenta    = "#bb9af7";
+          magenta2   = "#ff007c";
+          orange     = "#ff9e64";
+          purple     = "#9d7cd8";
+          red        = "#f7768e";
+          red1       = "#db4b4b";
+          teal       = "#1abc9c";
+          terminal_black = "#414868";
+          white      = "#c0caf5";
+          yellow     = "#e0af68";
+          yellow1    = "#d6a42b";
+        };
+
+        format = "$username$hostname$directory$character";
+
+        username = {
+          style_user  = "bold blue";
+          style_root  = "bold red";
+          format      = "[$user]($style)";
+          show_always = true;
+        };
+
+        hostname = {
+          style    = "bold magenta";
+          format   = "[@$hostname]($style) ";
+          ssh_only = false;
+        };
+
+        directory = {
+          style             = "bold blue";
+          format            = "[$path]($style) ";
+          truncation_length = 3;
+          truncate_to_repo  = false;
+        };
+
+        character = {
+          success_symbol = "[❯](bold green)";
+          error_symbol   = "[❯](bold red)";
+        };
+
+        cmd_duration = {
+          min_time = 2000;
+          style    = "bold orange";
+          format   = "[\${duration}]($style) ";
+        };
+
+        python.disabled     = true;
+        nodejs.disabled     = true;
+        rust.disabled       = true;
+        package.disabled    = true;
+        nix_shell.disabled  = true;
+        git_branch.disabled = true;
+        git_status.disabled = true;
+        git_state.disabled  = true;
+      };
     };
 
     # ── Git ─────────────────────────────────────────────────────────────
     programs.git = {
       enable = true;
       settings.user = {
-        name  = "Matthew";
+        name  = "TK4108";
         email = "matthew@kith.us";
       };
       settings.core = {
@@ -280,6 +367,197 @@
         rebase = false;       # Merge instead of rebase on pull
       };
     };
+
+    # ── Neovim ──────────────────────────────────────────────────────────
+    programs.neovim = {
+      enable        = true;
+      defaultEditor = true;   # makes neovim the default $EDITOR system-wide
+      viAlias       = true;   # lets you type 'vi' to open neovim
+      vimAlias      = true;   # lets you type 'vim' to open neovim
+
+      plugins = with pkgs.vimPlugins; [
+        # Theme
+        tokyonight-nvim
+
+        # File tree sidebar — browse your files
+        nvim-tree-lua
+        nvim-web-devicons
+
+        # Fuzzy finder — quickly open any file by typing part of its name
+        telescope-nvim
+        plenary-nvim
+
+        # Status bar showing file, mode, and git info
+        lualine-nvim
+
+        # LSP — shows errors and gives autocomplete for Nix and Bash
+        nvim-cmp
+        cmp-nvim-lsp
+        cmp-buffer
+        cmp-path
+        luasnip
+
+        # Shows available keybindings when you press Space
+        which-key-nvim
+
+        # Auto-close brackets and quotes
+        nvim-autopairs
+
+        # Comment lines with gcc
+        comment-nvim
+      ];
+
+      # Language servers for Nix and Bash
+      extraPackages = with pkgs; [
+        nil                   # Nix LSP
+        bash-language-server  # Bash LSP
+      ];
+
+      initLua = ''
+        -- ── General settings ────────────────────────────────────────────
+        vim.opt.number        = true
+        vim.opt.expandtab     = true
+        vim.opt.tabstop       = 2
+        vim.opt.shiftwidth    = 2
+        vim.opt.smartindent   = true
+        vim.opt.scrolloff     = 5
+        vim.opt.termguicolors = true
+        vim.opt.clipboard     = "unnamedplus"
+        vim.opt.mouse         = "a"
+        vim.opt.ignorecase    = true
+        vim.opt.smartcase     = true
+        vim.opt.wrap          = true
+        vim.opt.linebreak     = true
+
+        -- ── Theme ────────────────────────────────────────────────────────
+        require("tokyonight").setup({ style = "night" })
+        vim.cmd.colorscheme("tokyonight-night")
+
+        -- ── File tree ────────────────────────────────────────────────────
+        require("nvim-tree").setup()
+        vim.keymap.set("n", "<C-n>", ":NvimTreeToggle<CR>",
+          { silent = true, desc = "Toggle file tree" })
+
+        -- ── Telescope ────────────────────────────────────────────────────
+        local telescope = require("telescope.builtin")
+        vim.keymap.set("n", "<leader>ff", telescope.find_files,  { desc = "Find files" })
+        vim.keymap.set("n", "<leader>fg", telescope.live_grep,   { desc = "Search in files" })
+        vim.keymap.set("n", "<leader>fb", telescope.buffers,     { desc = "Open buffers" })
+
+        -- ── Status bar ───────────────────────────────────────────────────
+        require("lualine").setup({
+          options = {
+            theme        = "tokyonight",
+            globalstatus = true,
+          },
+          sections = {
+            lualine_a = { "mode" },
+            lualine_b = { "branch", "diff" },
+            lualine_c = { "filename" },
+            lualine_x = { "diagnostics", "filetype" },
+            lualine_y = { "progress" },
+            lualine_z = { "location" },
+          },
+        })
+
+        -- ── Which-key ────────────────────────────────────────────────────
+        require("which-key").setup()
+
+        -- ── LSP ──────────────────────────────────────────────────────────
+        -- Neovim 0.11+ built-in LSP config (replaces nvim-lspconfig)
+        local capabilities = require("cmp_nvim_lsp").default_capabilities()
+
+        vim.lsp.config("nil_ls", {
+          cmd          = { "nil" },
+          filetypes    = { "nix" },
+          root_markers = { "flake.nix", ".git" },
+          capabilities = capabilities,
+        })
+        vim.lsp.enable("nil_ls")
+
+        vim.lsp.config("bash_ls", {
+          cmd          = { "bash-language-server", "start" },
+          filetypes    = { "bash", "sh" },
+          capabilities = capabilities,
+        })
+        vim.lsp.enable("bash_ls")
+
+        vim.api.nvim_create_autocmd("LspAttach", {
+          callback = function(ev)
+            local opts = { buffer = ev.buf }
+            vim.keymap.set("n", "K",  vim.lsp.buf.hover,      opts)
+            vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+          end,
+        })
+
+        -- ── Autocompletion ───────────────────────────────────────────────
+        local cmp     = require("cmp")
+        local luasnip = require("luasnip")
+        cmp.setup({
+          snippet = {
+            expand = function(args) luasnip.lsp_expand(args.body) end,
+          },
+          mapping = cmp.mapping.preset.insert({
+            ["<Tab>"]     = cmp.mapping.select_next_item(),
+            ["<S-Tab>"]   = cmp.mapping.select_prev_item(),
+            ["<CR>"]      = cmp.mapping.confirm({ select = true }),
+            ["<C-Space>"] = cmp.mapping.complete(),
+          }),
+          sources = {
+            { name = "nvim_lsp" },
+            { name = "buffer" },
+            { name = "path" },
+          },
+        })
+
+        -- ── Auto pairs ───────────────────────────────────────────────────
+        require("nvim-autopairs").setup()
+
+        -- ── Comments ─────────────────────────────────────────────────────
+        require("Comment").setup()
+      '';
+    };
+
+    # ── GTK Theme ────────────────────────────────────────────────────────
+    # Tokyo Night for LibreWolf, GIMP, LibreOffice and other GTK apps.
+    gtk = {
+      enable = true;
+      theme = {
+        name    = "Tokyonight-Dark-BL";
+        package = pkgs.tokyonight-gtk-theme;
+      };
+      iconTheme = {
+        name    = "Papirus-Dark";
+        package = pkgs.papirus-icon-theme;
+      };
+      font = {
+        name = "Noto Sans";
+        size = 11;
+      };
+      gtk4.theme = null;  # adopt new default behavior (26.05+)
+    };
+
+    # ── Nano ─────────────────────────────────────────────────────────────
+    # Tokyo Night color scheme for nano via .nanorc in home directory.
+    home.file.".nanorc".text = ''
+      set linenumbers
+      set autoindent
+      set tabsize 2
+      set tabstospaces
+      set mouse
+      set softwrap
+
+      ## Tokyo Night Night colors
+      set titlecolor bold,white,#1a1b26
+      set statuscolor bold,white,#1a1b26
+      set errorcolor bold,white,#f7768e
+      set selectedcolor bold,black,#7aa2f7
+      set stripecolor ,#1e2030
+      set scrollercolor ,#3b4261
+      set numbercolor cyan,#1a1b26
+      set keycolor bold,cyan,#1a1b26
+      set functioncolor green,#1a1b26
+    '';
 
     # ── SSH ─────────────────────────────────────────────────────────────
     # Automatically add SSH keys to agent on first use — no manual
@@ -307,11 +585,209 @@
       videos              = "$HOME/Videos";
       download            = "$HOME/Downloads";
     };
+
+    # ── COSMIC Manager ──────────────────────────────────────────────────
+    # Declarative COSMIC desktop configuration via cosmic-manager.
+    # Requires: sudo nix-channel --add \
+    #   https://github.com/HeitorAugustoLN/cosmic-manager/archive/main.tar.gz \
+    #   cosmic-manager && sudo nix-channel --update
+    wayland.desktopManager.cosmic.enable = true;
+
+    # ── COSMIC Appearance ───────────────────────────────────────────────
+    wayland.desktopManager.cosmic.appearance.theme.dark = {
+      active_hint = 1;  # 1px window border
+      gaps = cosmicLib.cosmic.mkRON "tuple" [ 3 3 ];  # 3px gaps around tiled windows
+      corner_radii = {
+        radius_0  = cosmicLib.cosmic.mkRON "tuple" [ 0.0  0.0  0.0  0.0  ];
+        radius_xs = cosmicLib.cosmic.mkRON "tuple" [ 2.0  2.0  2.0  2.0  ];
+        radius_s  = cosmicLib.cosmic.mkRON "tuple" [ 4.0  4.0  4.0  4.0  ];
+        radius_m  = cosmicLib.cosmic.mkRON "tuple" [ 8.0  8.0  8.0  8.0  ];
+        radius_l  = cosmicLib.cosmic.mkRON "tuple" [ 16.0 16.0 16.0 16.0 ];
+        radius_xl = cosmicLib.cosmic.mkRON "tuple" [ 32.0 32.0 32.0 32.0 ];
+      };
+    };
+
+    # ── COSMIC Terminal ─────────────────────────────────────────────────
+    programs.cosmic-term = {
+      enable = true;
+      settings = {
+        app_theme        = cosmicLib.cosmic.mkRON "enum" "Dark";
+        font_name        = "JetBrains Mono";
+        font_size        = 14;
+        opacity          = 100;
+        show_headerbar   = true;
+        use_bright_bold  = true;
+      };
+      # Tokyo Night Night — matches Neovim and terminal theme
+      colorSchemes = [
+        {
+          name              = "Tokyo Night Night";
+          mode              = "dark";
+          foreground        = "#c0caf5";
+          bright_foreground = "#c0caf5";
+          dim_foreground    = "#a9b1d6";
+          cursor            = "#c0caf5";
+          normal = {
+            black   = "#15161e";
+            red     = "#f7768e";
+            green   = "#9ece6a";
+            yellow  = "#e0af68";
+            blue    = "#7aa2f7";
+            magenta = "#bb9af7";
+            cyan    = "#7dcfff";
+            white   = "#a9b1d6";
+          };
+          bright = {
+            black   = "#414868";
+            red     = "#f7768e";
+            green   = "#9ece6a";
+            yellow  = "#e0af68";
+            blue    = "#7aa2f7";
+            magenta = "#bb9af7";
+            cyan    = "#7dcfff";
+            white   = "#c0caf5";
+          };
+          dim = {
+            black   = "#15161e";
+            red     = "#f7768e";
+            green   = "#9ece6a";
+            yellow  = "#e0af68";
+            blue    = "#7aa2f7";
+            magenta = "#bb9af7";
+            cyan    = "#7dcfff";
+            white   = "#a9b1d6";
+          };
+        }
+      ];
+      profiles = [
+        {
+          name               = "Default";
+          is_default         = true;
+          hold               = false;
+          command            = "bash";
+          syntax_theme_dark  = "Tokyo Night Night";
+          syntax_theme_light = "COSMIC Light";
+        }
+      ];
+    };
+
+    # ── COSMIC Files ────────────────────────────────────────────────────
+    programs.cosmic-files = {
+      enable = true;
+      settings = {
+        app_theme    = cosmicLib.cosmic.mkRON "enum" "Dark";
+        show_details = false;
+        desktop = {
+          show_content        = true;
+          show_mounted_drives = true;
+          show_trash          = false;
+        };
+        tab = {
+          folders_first = true;
+          show_hidden   = false;
+          view          = cosmicLib.cosmic.mkRON "enum" "List";
+          icon_sizes = {
+            grid = 100;
+            list = 100;
+          };
+        };
+        favorites = [
+          (cosmicLib.cosmic.mkRON "enum" "Home")
+          (cosmicLib.cosmic.mkRON "enum" "Documents")
+          (cosmicLib.cosmic.mkRON "enum" "Downloads")
+          (cosmicLib.cosmic.mkRON "enum" "Music")
+          (cosmicLib.cosmic.mkRON "enum" "Pictures")
+          (cosmicLib.cosmic.mkRON "enum" "Videos")
+          (cosmicLib.cosmic.mkRON "enum" { value = [ "/games" ]; variant = "Path"; })
+        ];
+      };
+    };
+
+    # ── COSMIC Text Editor ───────────────────────────────────────────────
+    programs.cosmic-edit = {
+      enable = true;
+      settings = {
+        app_theme           = cosmicLib.cosmic.mkRON "enum" "Dark";
+        font_name           = "JetBrains Mono";
+        font_size           = 14;
+        tab_width           = 2;
+        auto_indent         = true;
+        word_wrap           = true;
+        line_numbers        = true;
+        highlight_current_line = true;
+        vim_bindings        = true;   # vim keybindings enabled
+        syntax_theme_dark   = "COSMIC Dark";
+        syntax_theme_light  = "COSMIC Light";
+      };
+    };
+
+    # ── COSMIC App Library ───────────────────────────────────────────────
+    # Note: App Library groups are best configured through the UI since
+    # app IDs vary by installation method and the RON tuple enum format
+    # for filters is not reliably expressible via cosmic-manager.
+    programs.cosmic-applibrary.enable = true;
+
+    # ── COSMIC Store ─────────────────────────────────────────────────────
+    programs.cosmic-store = {
+      enable = true;
+      settings = {
+        app_theme = cosmicLib.cosmic.mkRON "enum" "Dark";
+      };
+    };
+
+    # ── COSMIC Media Player ──────────────────────────────────────────────
+    programs.cosmic-player = {
+      enable = true;
+      settings = {
+        app_theme = cosmicLib.cosmic.mkRON "enum" "Dark";
+      };
+    };
+
+    # ── Forecast (Weather) ───────────────────────────────────────────────
+    programs.forecast = {
+      enable = true;
+      settings = {
+        app_theme      = cosmicLib.cosmic.mkRON "enum" "Dark";
+        timefmt        = cosmicLib.cosmic.mkRON "enum" "TwentyFourHr";
+        units          = cosmicLib.cosmic.mkRON "enum" "Fahrenheit";
+        speed_units    = cosmicLib.cosmic.mkRON "enum" "MilesPerHour";
+        pressure_units = cosmicLib.cosmic.mkRON "enum" "Hectopascal";
+        default_page   = cosmicLib.cosmic.mkRON "enum" "HourlyView";
+        # Finksburg, MD
+        location  = cosmicLib.cosmic.mkRON "optional" "Finksburg, MD";
+        latitude  = cosmicLib.cosmic.mkRON "optional" "39.4912";
+        longitude = cosmicLib.cosmic.mkRON "optional" "-76.8747";
+      };
+    };
+
+    # ── COSMIC Tasks ─────────────────────────────────────────────────────
+    programs.tasks = {
+      enable = true;
+      settings = {
+        app_theme = cosmicLib.cosmic.mkRON "enum" "Dark";
+      };
+    };
+
+    # ── COSMIC Tweaks ────────────────────────────────────────────────────
+    programs.cosmic-ext-tweaks = {
+      enable = true;
+      settings = {
+        app_theme = cosmicLib.cosmic.mkRON "enum" "Dark";
+      };
+    };
   };
 
   # ── Desktop Environment ───────────────────────────────────────────────
   services.displayManager.cosmic-greeter.enable = true;
   services.desktopManager.cosmic.enable = true;
+
+  # ── Chromium ──────────────────────────────────────────────────────────
+  programs.chromium = {
+    enable = true;
+    extensions = [
+      "fbdlhcdkmaleonkhckokleapdgilbcph"  # Tokyo Night theme
+    ];
+  };
 
   # ── Steam ─────────────────────────────────────────────────────────────
   programs.steam = {
@@ -364,6 +840,7 @@
     noto-fonts
     noto-fonts-color-emoji
     liberation_ttf
+    jetbrains-mono       # Used in COSMIC Terminal, Text Editor, and Neovim
   ];
 
   # ── Firmware ──────────────────────────────────────────────────────────
