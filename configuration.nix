@@ -150,6 +150,7 @@
     mesa-demos          # glxinfo/glxgears for testing graphics
     clinfo              # verify OpenCL setup
     nvtopPackages.amd   # GPU monitoring in terminal
+    dualsensectl        # PS5 DualSense controller — lightbar, LEDs, battery, mic control
 
     # Browsers
     librewolf
