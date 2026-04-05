@@ -257,6 +257,7 @@
         rebuild = "sudo nixos-rebuild switch";
         update  = "sudo nixos-rebuild switch --upgrade";
         apply   = "~/update-config.sh";
+        gitsync = ''read -p "Commit message: " msg && git -C /etc/nixos add -A && git -C /etc/nixos commit -m "$msg" && git -C /etc/nixos push'';
       };
       initExtra = ''
         fastfetch
