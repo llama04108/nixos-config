@@ -256,6 +256,7 @@
         gs      = "git status";
         rebuild = "sudo nixos-rebuild switch";
         update  = "sudo nixos-rebuild switch --upgrade";
+        apply   = "~/update-config.sh";
       };
       initExtra = ''
         fastfetch
@@ -263,43 +264,38 @@
     };
 
     # ── Starship prompt ─────────────────────────────────────────────────
-    # Single-line prompt using Tokyo Night Night colors.
+    # Single-line prompt using Catppuccin Mocha colors.
     programs.starship = {
       enable = true;
       settings = {
-        palette = "tokyonight_night";
-        palettes.tokyonight_night = {
-          bg         = "#1a1b26";
-          bg_dark    = "#16161e";
-          bg_highlight = "#292e42";
-          blue       = "#7aa2f7";
-          blue0      = "#3d59a1";
-          blue1      = "#2ac3de";
-          blue2      = "#0db9d7";
-          blue5      = "#89ddff";
-          blue6      = "#b4f9f8";
-          blue7      = "#394b70";
-          comment    = "#565f89";
-          cyan       = "#7dcfff";
-          dark3      = "#545c7e";
-          dark5      = "#737aa2";
-          fg         = "#c0caf5";
-          fg_dark    = "#a9b1d6";
-          fg_gutter  = "#3b4261";
-          green      = "#9ece6a";
-          green1     = "#73daca";
-          green2     = "#41a6b5";
-          magenta    = "#bb9af7";
-          magenta2   = "#ff007c";
-          orange     = "#ff9e64";
-          purple     = "#9d7cd8";
-          red        = "#f7768e";
-          red1       = "#db4b4b";
-          teal       = "#1abc9c";
-          terminal_black = "#414868";
-          white      = "#c0caf5";
-          yellow     = "#e0af68";
-          yellow1    = "#d6a42b";
+        palette = "catppuccin_mocha";
+        palettes.catppuccin_mocha = {
+          rosewater = "#f5e0dc";
+          flamingo  = "#f2cdcd";
+          pink      = "#f5c2e7";
+          mauve     = "#cba6f7";
+          red       = "#f38ba8";
+          maroon    = "#eba0ac";
+          peach     = "#fab387";
+          yellow    = "#f9e2af";
+          green     = "#a6e3a1";
+          teal      = "#94e2d5";
+          sky       = "#89dceb";
+          sapphire  = "#74c7ec";
+          blue      = "#89b4fa";
+          lavender  = "#b4befe";
+          text      = "#cdd6f4";
+          subtext1  = "#bac2de";
+          subtext0  = "#a6adc8";
+          overlay2  = "#9399b2";
+          overlay1  = "#7f849c";
+          overlay0  = "#6c7086";
+          surface2  = "#585b70";
+          surface1  = "#45475a";
+          surface0  = "#313244";
+          base      = "#1e1e2e";
+          mantle    = "#181825";
+          crust     = "#11111b";
         };
 
         format = "$username$hostname$directory$character";
@@ -312,13 +308,13 @@
         };
 
         hostname = {
-          style    = "bold magenta";
+          style    = "bold mauve";
           format   = "[@$hostname]($style) ";
           ssh_only = false;
         };
 
         directory = {
-          style             = "bold blue";
+          style             = "bold lavender";
           format            = "[$path]($style) ";
           truncation_length = 3;
           truncate_to_repo  = false;
@@ -365,7 +361,7 @@
 
       plugins = with pkgs.vimPlugins; [
         # Theme
-        tokyonight-nvim
+        catppuccin-nvim
 
         # File tree sidebar — browse your files
         nvim-tree-lua
@@ -418,8 +414,8 @@
         vim.opt.linebreak     = true
 
         -- ── Theme ────────────────────────────────────────────────────────
-        require("tokyonight").setup({ style = "night" })
-        vim.cmd.colorscheme("tokyonight-night")
+        require("catppuccin").setup({ flavour = "mocha" })
+        vim.cmd.colorscheme("catppuccin-mocha")
 
         -- ── File tree ────────────────────────────────────────────────────
         require("nvim-tree").setup()
@@ -435,7 +431,7 @@
         -- ── Status bar ───────────────────────────────────────────────────
         require("lualine").setup({
           options = {
-            theme        = "tokyonight",
+            theme        = "catppuccin",
             globalstatus = true,
           },
           sections = {
@@ -507,12 +503,15 @@
     };
 
     # ── GTK Theme ────────────────────────────────────────────────────────
-    # Tokyo Night for LibreWolf, GIMP, LibreOffice and other GTK apps.
+    # Catppuccin Mocha for LibreWolf, GIMP, LibreOffice and other GTK apps.
     gtk = {
       enable = true;
       theme = {
-        name    = "Tokyonight-Dark-BL";
-        package = pkgs.tokyonight-gtk-theme;
+        name    = "Catppuccin-Mocha-Standard-Mauve-Dark";
+        package = pkgs.catppuccin-gtk.override {
+          accents = [ "mauve" ];
+          variant = "mocha";
+        };
       };
       iconTheme = {
         name    = "Papirus-Dark";
@@ -522,11 +521,11 @@
         name = "Noto Sans";
         size = 11;
       };
-      gtk4.theme = null;  # adopt new default behavior (26.05+)
+      gtk4.theme = null;
     };
 
     # ── Nano ─────────────────────────────────────────────────────────────
-    # Tokyo Night color scheme for nano via .nanorc in home directory.
+    # Catppuccin Mocha color scheme for nano.
     home.file.".nanorc".text = ''
       set linenumbers
       set autoindent
@@ -535,16 +534,16 @@
       set mouse
       set softwrap
 
-      ## Tokyo Night Night colors
-      set titlecolor bold,white,#1a1b26
-      set statuscolor bold,white,#1a1b26
-      set errorcolor bold,white,#f7768e
-      set selectedcolor bold,black,#7aa2f7
-      set stripecolor ,#1e2030
-      set scrollercolor ,#3b4261
-      set numbercolor cyan,#1a1b26
-      set keycolor bold,cyan,#1a1b26
-      set functioncolor green,#1a1b26
+      ## Catppuccin Mocha colors
+      set titlecolor bold,white,#1e1e2e
+      set statuscolor bold,white,#1e1e2e
+      set errorcolor bold,white,#f38ba8
+      set selectedcolor bold,black,#89b4fa
+      set stripecolor ,#313244
+      set scrollercolor ,#45475a
+      set numbercolor cyan,#1e1e2e
+      set keycolor bold,cyan,#1e1e2e
+      set functioncolor green,#1e1e2e
     '';
 
     # ── SSH ─────────────────────────────────────────────────────────────
@@ -590,6 +589,12 @@
     wayland.desktopManager.cosmic.appearance.theme.dark = {
       active_hint = 1;  # 1px window border
       gaps = cosmicLib.cosmic.mkRON "tuple" [ 3 3 ];  # 3px gaps around tiled windows
+      # Catppuccin Mocha mauve (#cba6f7) — closest to Proton Carbon's purple accent
+      accent = cosmicLib.cosmic.mkRON "optional" {
+        red   = 0.796;
+        green = 0.651;
+        blue  = 0.969;
+      };
       corner_radii = {
         radius_0  = cosmicLib.cosmic.mkRON "tuple" [ 0.0  0.0  0.0  0.0  ];
         radius_xs = cosmicLib.cosmic.mkRON "tuple" [ 2.0  2.0  2.0  2.0  ];
@@ -612,44 +617,44 @@
         show_headerbar   = true;
         use_bright_bold  = true;
       };
-      # Tokyo Night Night — matches Neovim and terminal theme
+      # Catppuccin Mocha — matches Neovim and Proton Carbon theme
       colorSchemes = [
         {
-          name              = "Tokyo Night Night";
+          name              = "Catppuccin Mocha";
           mode              = "dark";
-          foreground        = "#c0caf5";
-          bright_foreground = "#c0caf5";
-          dim_foreground    = "#a9b1d6";
-          cursor            = "#c0caf5";
+          foreground        = "#cdd6f4";
+          bright_foreground = "#cdd6f4";
+          dim_foreground    = "#a6adc8";
+          cursor            = "#f5e0dc";
           normal = {
-            black   = "#15161e";
-            red     = "#f7768e";
-            green   = "#9ece6a";
-            yellow  = "#e0af68";
-            blue    = "#7aa2f7";
-            magenta = "#bb9af7";
-            cyan    = "#7dcfff";
-            white   = "#a9b1d6";
+            black   = "#45475a";
+            red     = "#f38ba8";
+            green   = "#a6e3a1";
+            yellow  = "#f9e2af";
+            blue    = "#89b4fa";
+            magenta = "#f5c2e7";
+            cyan    = "#94e2d5";
+            white   = "#bac2de";
           };
           bright = {
-            black   = "#414868";
-            red     = "#f7768e";
-            green   = "#9ece6a";
-            yellow  = "#e0af68";
-            blue    = "#7aa2f7";
-            magenta = "#bb9af7";
-            cyan    = "#7dcfff";
-            white   = "#c0caf5";
+            black   = "#585b70";
+            red     = "#f38ba8";
+            green   = "#a6e3a1";
+            yellow  = "#f9e2af";
+            blue    = "#89b4fa";
+            magenta = "#f5c2e7";
+            cyan    = "#94e2d5";
+            white   = "#a6adc8";
           };
           dim = {
-            black   = "#15161e";
-            red     = "#f7768e";
-            green   = "#9ece6a";
-            yellow  = "#e0af68";
-            blue    = "#7aa2f7";
-            magenta = "#bb9af7";
-            cyan    = "#7dcfff";
-            white   = "#a9b1d6";
+            black   = "#45475a";
+            red     = "#f38ba8";
+            green   = "#a6e3a1";
+            yellow  = "#f9e2af";
+            blue    = "#89b4fa";
+            magenta = "#f5c2e7";
+            cyan    = "#94e2d5";
+            white   = "#bac2de";
           };
         }
       ];
@@ -659,7 +664,7 @@
           is_default         = true;
           hold               = false;
           command            = "bash";
-          syntax_theme_dark  = "Tokyo Night Night";
+          syntax_theme_dark  = "Catppuccin Mocha";
           syntax_theme_light = "COSMIC Light";
         }
       ];
@@ -712,7 +717,7 @@
         line_numbers        = true;
         highlight_current_line = true;
         vim_bindings        = true;   # vim keybindings enabled
-        syntax_theme_dark   = "COSMIC Dark";
+        syntax_theme_dark   = "Dracula";
         syntax_theme_light  = "COSMIC Light";
       };
     };
@@ -782,7 +787,7 @@
   programs.chromium = {
     enable = true;
     extensions = [
-      "fbdlhcdkmaleonkhckokleapdgilbcph"  # Tokyo Night theme
+      "bkkmolkhemgaeaeggcmcofaljaljmgdn"  # Catppuccin Mocha theme
     ];
   };
 
