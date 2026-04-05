@@ -65,8 +65,8 @@
   # AMDVLK is being discontinued anyway.
   environment.variables = {
     AMD_VULKAN_ICD = "RADV";
-    RADV_PERFTEST  = "gpl";  # Faster shader compilation, reduces stutter
-    DXVK_ASYNC     = "1";    # Async shader compilation in DXVK
+    RADV_PERFTEST  = "gpl";
+    DXVK_ASYNC     = "1";
   };
 
   # ── Networking ────────────────────────────────────────────────────────
@@ -115,10 +115,7 @@
   };
 
   # ── Input ─────────────────────────────────────────────────────────────
-  services.xserver.xkb = {
-    layout = "us";
-    variant = "";
-  };
+  services.xserver.xkb.layout = "us";
 
   # Disable mouse acceleration — flat profile gives 1:1 movement.
   services.libinput.mouse.accelProfile = "flat";
@@ -133,7 +130,6 @@
       "audio"    # MIDI and real-time audio device access
       "realtime" # Real-time scheduling priority
     ];
-    packages = with pkgs; [];
   };
 
   # ── Packages ──────────────────────────────────────────────────────────
@@ -157,6 +153,7 @@
 
     # Browsers
     librewolf
+    chromium
 
     # Gaming
     mangohud            # FPS/GPU/CPU overlay
@@ -332,20 +329,11 @@
           error_symbol   = "[❯](bold red)";
         };
 
-        cmd_duration = {
-          min_time = 2000;
-          style    = "bold orange";
-          format   = "[\${duration}]($style) ";
-        };
-
-        python.disabled     = true;
-        nodejs.disabled     = true;
-        rust.disabled       = true;
-        package.disabled    = true;
-        nix_shell.disabled  = true;
-        git_branch.disabled = true;
-        git_status.disabled = true;
-        git_state.disabled  = true;
+        python.disabled   = true;
+        nodejs.disabled   = true;
+        rust.disabled     = true;
+        package.disabled  = true;
+        nix_shell.disabled = true;
       };
     };
 
@@ -574,7 +562,6 @@
     services.ssh-agent.enable = true;
 
     # ── XDG Directories ─────────────────────────────────────────────────
-    # Fixed: setSessionVariables = true silences the stateVersion warning
     xdg.userDirs = {
       enable              = true;
       createDirectories   = true;
@@ -584,6 +571,12 @@
       pictures            = "$HOME/Pictures";
       videos              = "$HOME/Videos";
       download            = "$HOME/Downloads";
+    };
+
+    # Hide Neovim wrapper desktop entry — removes duplicate from launcher.
+    xdg.desktopEntries.nvim = {
+      name      = "Neovim";
+      noDisplay = true;
     };
 
     # ── COSMIC Manager ──────────────────────────────────────────────────
@@ -609,7 +602,8 @@
 
     # ── COSMIC Terminal ─────────────────────────────────────────────────
     programs.cosmic-term = {
-      enable = true;
+      enable  = true;
+      package = null;  # already installed by services.desktopManager.cosmic
       settings = {
         app_theme        = cosmicLib.cosmic.mkRON "enum" "Dark";
         font_name        = "JetBrains Mono";
@@ -673,7 +667,8 @@
 
     # ── COSMIC Files ────────────────────────────────────────────────────
     programs.cosmic-files = {
-      enable = true;
+      enable  = true;
+      package = null;  # already installed by services.desktopManager.cosmic
       settings = {
         app_theme    = cosmicLib.cosmic.mkRON "enum" "Dark";
         show_details = false;
@@ -705,7 +700,8 @@
 
     # ── COSMIC Text Editor ───────────────────────────────────────────────
     programs.cosmic-edit = {
-      enable = true;
+      enable  = true;
+      package = null;  # already installed by services.desktopManager.cosmic
       settings = {
         app_theme           = cosmicLib.cosmic.mkRON "enum" "Dark";
         font_name           = "JetBrains Mono";
@@ -737,7 +733,8 @@
 
     # ── COSMIC Media Player ──────────────────────────────────────────────
     programs.cosmic-player = {
-      enable = true;
+      enable  = true;
+      package = null;  # already installed by services.desktopManager.cosmic
       settings = {
         app_theme = cosmicLib.cosmic.mkRON "enum" "Dark";
       };
