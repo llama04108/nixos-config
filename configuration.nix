@@ -525,6 +525,36 @@
       gtk4.theme = null;
     };
 
+    # ── Scripts ──────────────────────────────────────────────────────────
+    # Copy configuration.nix from Downloads and rebuild NixOS.
+    # Usage: apply (via alias) or ~/update-config.sh
+    home.file."update-config.sh" = {
+      executable = true;
+      text = ''
+        #!/usr/bin/env bash
+        set -e
+
+        SRC="$HOME/Downloads/configuration.nix"
+        DEST="/etc/nixos/configuration.nix"
+
+        if [ ! -f "$SRC" ]; then
+          echo "Error: $SRC not found."
+          exit 1
+        fi
+
+        echo "Copying $SRC to $DEST..."
+        sudo cp "$SRC" "$DEST"
+
+        echo "Removing $SRC..."
+        rm "$SRC"
+
+        echo "Rebuilding NixOS..."
+        sudo nixos-rebuild switch
+
+        echo "Done."
+      '';
+    };
+
     # ── Nano ─────────────────────────────────────────────────────────────
     # Catppuccin Mocha color scheme for nano.
     home.file.".nanorc".text = ''
