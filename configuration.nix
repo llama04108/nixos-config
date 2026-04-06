@@ -67,6 +67,8 @@
     AMD_VULKAN_ICD = "RADV";
     RADV_PERFTEST  = "gpl";
     DXVK_ASYNC     = "1";
+    # Expose Nix-installed VST3 plugins to Bitwig, Carla, and other hosts.
+    VST3_PATH      = "/run/current-system/sw/lib/vst3";
   };
 
   # ── Networking ────────────────────────────────────────────────────────
@@ -168,36 +170,35 @@
     vkd3d-proton        # DirectX 12 → Vulkan
 
     # Audio routing and monitoring
-    qpwgraph            # PipeWire/JACK patchbay — essential for routing in Reaper
+    qpwgraph            # PipeWire/JACK patchbay — audio routing for Bitwig
     pavucontrol         # PulseAudio/Pipewire volume control GUI
     carla               # Plugin host — run VSTs/LV2s standalone or as plugins
 
     # MIDI utilities
-    a2jmidid            # ALSA to JACK MIDI bridge — some apps need this
-    qmidinet            # Network MIDI — useful for routing MIDI between apps
-    kmidimon            # MIDI monitor — see exactly what your controller is sending
+    a2jmidid            # ALSA to JACK MIDI bridge
+    qmidinet            # Network MIDI
+    kmidimon            # MIDI monitor — see what your controller is sending
 
     # Plugin formats and support
     ladspa-sdk          # LADSPA plugin support
     lv2                 # LV2 plugin support (best Linux-native format)
 
     # Plugins and instruments
-    helm                # Polyphonic synth (LV2/VST) — unmaintained but still functional
+    helm                # Polyphonic synth (LV2/VST)
     distrho-ports       # Large collection of ported VST/LV2 plugins
     zam-plugins         # EQ, compressor, limiter plugins
     dragonfly-reverb    # High quality reverb plugins
     calf                # Studio-quality effects (EQ, compressor, etc)
-    surge-xt            # Synth with Linnstrument settings
+    surge-xt            # Surge XT synth — installs VST3/LV2 plugins + standalone
 
     # Audio utilities
-    ffmpeg              # Audio/video conversion, Reaper uses this
+    ffmpeg              # Audio/video conversion
     sox                 # Command-line audio processing
-    reaper              # Digital Audio Workstation
+    bitwig-studio       # Digital Audio Workstation (v5.x until v6 lands in nixpkgs)
 
     # Windows VST bridging
     yabridge            # Bridges Windows VST2/VST3 plugins to Linux
     yabridgectl         # CLI tool to manage yabridge
-
     # 3D / Design / Creative
     pkgsRocm.blender    # 3D creation — built with ROCm/HIP support for RX 7800 XT GPU rendering
     gimp                # Image editor
@@ -229,6 +230,7 @@
 
     # Media
     vlc
+    rclone             # Mount Proton Drive — configure with: rclone config
   ];
 
   # Point Steam to custom Proton-GE installs.
@@ -577,6 +579,38 @@
       set functioncolor green,#1e1e2e
     '';
 
+    # ── Proton Drive ─────────────────────────────────────────────────────
+    # Mounts Proton Drive at ~/ProtonDrive via rclone on login.
+    # First run 'rclone config' to set up a remote named 'protondrive'.
+    home.file."ProtonDrive/.keep".text = "";  # ensure mount point exists
+    systemd.user.services.rclone-protondrive = {
+      Unit = {
+        Description = "Proton Drive rclone mount";
+        After = [ "network-online.target" ];
+        Wants = [ "network-online.target" ];
+      };
+      Service = {
+        Type = "notify";
+        ExecStart = "${pkgs.rclone}/bin/rclone mount protondrive: %h/ProtonDrive --vfs-cache-mode minimal --vfs-cache-max-age 10m";
+        ExecStop = "/run/wrappers/bin/fusermount -u %h/ProtonDrive";
+        Restart = "on-failure";
+        RestartSec = "10s";
+      };
+      Install.WantedBy = [ "default.target" ];
+    };
+
+    # ── Proton VPN autostart ─────────────────────────────────────────────
+    # Launch Proton VPN GUI minimised to tray on login.
+    xdg.configFile."autostart/proton-vpn.desktop".text = ''
+      [Desktop Entry]
+      Type=Application
+      Name=Proton VPN
+      Exec=proton-vpn
+      Hidden=false
+      NoDisplay=false
+      X-GNOME-Autostart-enabled=true
+    '';
+
     # ── SSH ─────────────────────────────────────────────────────────────
     # Automatically add SSH keys to agent on first use — no manual
     # ssh-add needed after login.
@@ -810,6 +844,13 @@
     };
   };
 
+  # ── LocalSend ─────────────────────────────────────────────────────────
+  # Open source cross-platform alternative to AirDrop.
+  programs.localsend = {
+    enable = true;
+    openFirewall = true;
+  };
+
   # ── Desktop Environment ───────────────────────────────────────────────
   services.displayManager.cosmic-greeter.enable = true;
   services.desktopManager.cosmic.enable = true;
@@ -834,8 +875,7 @@
   programs.gamescope.enable = true;  # Micro-compositor, helps with scaling
 
   # ── Audio ─────────────────────────────────────────────────────────────
-  # Real-time audio priority — critical for low-latency recording
-  # and preventing xruns in Reaper.
+  # Real-time audio priority — critical for low-latency work in Bitwig.
   security.rtkit.enable = true;
 
   # Allow audio group members to use real-time scheduling.
@@ -850,15 +890,14 @@
     pulse.enable = true;
     alsa.enable = true;
     alsa.support32Bit = true;
-    jack.enable = true;  # Reaper works best via JACK
-    # Note: MIDI is supported automatically via ALSA and JACK — no extra option needed
+    jack.enable = true;  # Bitwig works via JACK for lowest latency
 
     extraConfig.pipewire = {
       "99-lowlatency" = {
         context.properties = {
           default.clock.rate        = 48000;
-          default.clock.quantum     = 64;   # 64 is more stable than 32 for Reaper
-          default.clock.min-quantum = 32;
+          default.clock.quantum     = 128;  # Bitwig default; lower if xruns occur
+          default.clock.min-quantum = 64;
           default.clock.max-quantum = 512;
         };
       };
