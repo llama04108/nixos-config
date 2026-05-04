@@ -16,8 +16,9 @@
   imports = [
     ./hardware-configuration.nix
     ../../modules/nixos/core/boot/uefi.nix
-    ../../modules/nixos/desktop/audio.nix
     ../../modules/nixos/core/locale.nix
+    ../../modules/nixos/core/nix-settings.nix
+    ../../modules/nixos/desktop/audio.nix
   ];
 
   # ─── Identity ───────────────────────────────────────────────────────
@@ -40,11 +41,6 @@
     description = "Matthew";
     extraGroups = [ "wheel" "networkmanager" "audio" ];
   };
-
-  # ─── Nix settings ───────────────────────────────────────────────────
-  # Required for any flake-based system. Will move to a
-  # `core/nix-settings.nix` module soon.
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # ─── State version ──────────────────────────────────────────────────
   # Pin to the NixOS release this system was first installed on.
