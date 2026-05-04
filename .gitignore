@@ -1,3 +1,4 @@
 hardware-configuration.nix
+!hosts/*/hardware-configuration.nix
 result
 @.swp
