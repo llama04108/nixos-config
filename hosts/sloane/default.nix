@@ -17,6 +17,7 @@
     ../../modules/nixos/core/networking.nix
     ../../modules/nixos/core/nix-settings.nix
     ../../modules/nixos/desktop/audio.nix
+    ../../modules/nixos/hardware/amd-gpu.nix
     ../../modules/nixos/hardware/intel-cpu.nix
   ];
 
@@ -31,8 +32,9 @@
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
   # ─── Module options ─────────────────────────────────────────────────
-  local.audio.lowLatency.enable = true;
+  local.audio.lowLatency.enable        = true;
   local.networking.gamingTweaks.enable = true;
+  local.hardware.amdGpu.rocm.enable    = true;
 
   # ─── User ───────────────────────────────────────────────────────────
   # Inline for now; will move to users/matthew/ with home-manager
