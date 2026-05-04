@@ -10,32 +10,33 @@
 
 {
   # ─── Imports ────────────────────────────────────────────────────────
-  # Pull in the hardware-detection file (generated at install time)
-  # plus every module this host wants. As we build out more modules,
-  # the list grows.
   imports = [
     ./hardware-configuration.nix
     ../../modules/nixos/core/boot/uefi.nix
     ../../modules/nixos/core/locale.nix
+    ../../modules/nixos/core/networking.nix
     ../../modules/nixos/core/nix-settings.nix
     ../../modules/nixos/desktop/audio.nix
+    ../../modules/nixos/hardware/intel-cpu.nix
   ];
 
   # ─── Identity ───────────────────────────────────────────────────────
   networking.hostName = "sloane";
 
-  # ─── Module options (the audio module's knobs) ──────────────────────
-  # Opt this host into the low-latency audio stack. The module's
-  # defaults (48kHz, quantum=64) suit sloane, so we just enable it.
+  # ─── Kernel ─────────────────────────────────────────────────────────
+  # Latest stable kernel for current AMD GPU support, PipeWire fixes,
+  # and Intel hybrid scheduler improvements. Sloane has modern hardware
+  # and benefits from staying current. Older hosts (e.g., isard) will
+  # likely use linuxPackages_lts instead — that's a per-host choice.
+  boot.kernelPackages = pkgs.linuxPackages_latest;
+
+  # ─── Module options ─────────────────────────────────────────────────
   local.audio.lowLatency.enable = true;
+  local.networking.gamingTweaks.enable = true;
 
   # ─── User ───────────────────────────────────────────────────────────
   # Inline for now; will move to users/matthew/ with home-manager
   # integration once we've built a few more modules.
-  #
-  # `audio` group: PAM limits from the audio module apply.
-  # `wheel`: sudo access.
-  # `networkmanager`: edit network connections without root.
   users.users.matthew = {
     isNormalUser = true;
     description = "Matthew";
@@ -43,9 +44,9 @@
   };
 
   # ─── State version ──────────────────────────────────────────────────
-  # Pin to the NixOS release this system was first installed on.
-  # NEVER change this value after install — it's a marker for
-  # NixOS to know which migration paths apply, not a "current
-  # version" indicator. Updates happen via `nix flake update`.
-  system.stateVersion = "25.11";
+  # Pin to the NixOS release this system was first installed under.
+  # NEVER change this value after install — it's a marker for NixOS
+  # to know which migration paths apply, not a "current version"
+  # indicator. Updates happen via `nix flake update`.
+  system.stateVersion = "26.05";
 }
