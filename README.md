@@ -1,1 +1,1 @@
-# NixOS configuration.nix for sloane
+# NixOS configuration for our family
