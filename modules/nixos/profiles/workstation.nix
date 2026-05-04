@@ -5,9 +5,8 @@
 # slicers, CAD, Blender, electronics.
 #
 # Composes the building-block modules and adds the user-facing
-# applications (browsers, DAWs, slicers, plugins, communication,
-# media). Daemons and hardware concerns live in their own modules
-# under desktop/, hardware/, and services/.
+# applications. Daemons and hardware concerns live in their own
+# modules under desktop/, hardware/, and services/.
 #
 # A future second workstation host could import this profile and
 # get the same setup. The kid/family hosts will use a much smaller
@@ -17,9 +16,6 @@
 
 {
   # ─── Composed modules ───────────────────────────────────────────────
-  # Everything sloane wants. Hosts that import this profile get the
-  # whole stack; hosts that want a subset import the modules
-  # individually.
   imports = [
     ../core/locale.nix
     ../core/networking.nix
@@ -35,41 +31,42 @@
   ];
 
   # ─── Module options ─────────────────────────────────────────────────
-  # Opt this profile into the modules that need a flag.
   local.audio.lowLatency.enable        = true;
   local.networking.gamingTweaks.enable = true;
   local.hardware.amdGpu.rocm.enable    = true;
 
   # ─── Steam ──────────────────────────────────────────────────────────
-  # Steam needs to be a NixOS program (not just a package) so that
-  # NixOS can set up the Steam runtime, network firewall rules,
-  # and font packaging properly.
+  # Steam needs to be a NixOS program (not just a package) so NixOS
+  # can set up the Steam runtime, firewall rules, and font packaging.
   programs.steam = {
     enable = true;
     remotePlay.openFirewall      = true;
     dedicatedServer.openFirewall = true;
   };
 
-  # Tell Steam where to find Proton-GE installs (managed via
-  # protonup-qt below). Without this, custom Proton versions
-  # show up as "missing" in Steam's compatibility tool list.
+  # Tell Steam where Proton-GE installs live (managed by protonplus).
+  # Without this, custom Proton versions show up as missing in
+  # Steam's compatibility tool list.
   environment.sessionVariables = {
     STEAM_EXTRA_COMPAT_TOOLS_PATHS = "$HOME/.steam/root/compatibilitytools.d";
   };
 
-  # ─── Gaming runtime tools ───────────────────────────────────────────
+  # ─── Gaming runtime ─────────────────────────────────────────────────
   # gamemode: kernel scheduling tweaks during gameplay (CPU
   # governor → performance, IO priority bumps). Used via
   # `gamemoderun %command%` in Steam launch options.
   programs.gamemode.enable = true;
 
-  # gamescope: micro-compositor for game scaling. Useful for
-  # forcing resolution/refresh independent of desktop, fixing
-  # broken-resolution games, and consistent HDR handling.
-  programs.gamescope.enable = true;
+  # ─── Shell ──────────────────────────────────────────────────────────
+  # System-level fish setup. Installs fish, registers it in
+  # /etc/shells (so users.users.<x>.shell = pkgs.fish works), and
+  # sets up vendor-provided completions for system commands.
+  # User-level fish config (prompt, aliases, abbreviations,
+  # plugin manager) goes in home-manager when we wire that up.
+  programs.fish.enable = true;
 
   # ─── Allow unfree packages ──────────────────────────────────────────
-  # Bitwig, Discord, Steam, Bambu Studio etc. are non-free.
+  # Bitwig, Discord/vesktop, Steam, Bambu Studio, etc. are non-free.
   nixpkgs.config.allowUnfree = true;
 
   # ─── User-facing applications ───────────────────────────────────────
@@ -81,9 +78,7 @@
     fastfetch
     pciutils                       # lspci for hardware inspection
     vulkan-tools                   # vulkaninfo to verify GPU stack
-    vulkan-loader                  # ensure Vulkan loader present
-    mesa-demos                     # glxinfo / glxgears
-    clinfo                         # OpenCL inspection
+    clinfo                         # OpenCL inspection (Blender HIP debug)
 
     # System / GPU monitoring
     btop                           # all-in-one TUI system monitor
@@ -118,19 +113,17 @@
 
     # Gaming runtime extras
     mangohud                       # FPS / sensor overlay
-    protonup-qt                    # manage Proton-GE versions
+    protonplus                     # manage Proton-GE versions
     adwsteamgtk                    # GTK theme for Steam
     winetricks                     # Windows dependency helper
-    wineWowPackages.stable         # 32+64-bit Wine for compat
-    dxvk                           # DirectX 9/10/11 → Vulkan
-    vkd3d-proton                   # DirectX 12 → Vulkan
+    wineWow64Packages.stable       # 32+64-bit Wine
 
     # Audio: routing and control
     qpwgraph                       # PipeWire patchbay
     pavucontrol                    # per-app volume
 
     # MIDI
-    kmidimon                       # MIDI traffic monitor (LinnStrument debug)
+    kmidimon                       # MIDI traffic monitor (LinnStrument)
 
     # Audio: instruments and processing
     surge-xt                       # synth (used with LinnStrument)
@@ -139,11 +132,12 @@
     # Audio: utilities and bridging
     ffmpeg
     sox
+    bitwig-studio
     yabridge                       # Windows VST → Linux bridge
     yabridgectl                    # yabridge management CLI
 
     # 3D / Design / Creative
-    blender                        # GPU-accelerated via ROCm (enabled above)
+    blender                        # GPU-accelerated via ROCm
     gimp
     krita
     freecad
@@ -162,7 +156,7 @@
 
     # Proton suite
     protonmail-desktop
-    proton-vpn-gtk-app
+    proton-vpn
     proton-pass
     proton-authenticator
 

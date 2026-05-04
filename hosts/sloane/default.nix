@@ -40,6 +40,7 @@
   users.users.matthew = {
     isNormalUser = true;
     description = "Matthew";
+    shell = pkgs.fish;
     extraGroups = [ "wheel" "networkmanager" "audio" "scanner" "lp" ];
   };
 
