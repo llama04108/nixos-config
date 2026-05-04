@@ -18,6 +18,7 @@
     ../../modules/nixos/core/nix-settings.nix
     ../../modules/nixos/desktop/audio.nix
     ../../modules/nixos/desktop/fonts.nix
+    ../../modules/nixos/desktop/printing.nix
     ../../modules/nixos/hardware/amd-gpu.nix
     ../../modules/nixos/hardware/bluetooth.nix
     ../../modules/nixos/hardware/intel-cpu.nix
@@ -45,7 +46,7 @@
   users.users.matthew = {
     isNormalUser = true;
     description = "Matthew";
-    extraGroups = [ "wheel" "networkmanager" "audio" ];
+    extraGroups = [ "wheel" "networkmanager" "audio" "scanner" "lp" ];
   };
 
   # ─── State version ──────────────────────────────────────────────────
