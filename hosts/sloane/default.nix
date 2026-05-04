@@ -22,6 +22,7 @@
     ../../modules/nixos/hardware/amd-gpu.nix
     ../../modules/nixos/hardware/bluetooth.nix
     ../../modules/nixos/hardware/intel-cpu.nix
+    ../../modules/nixos/services/flatpak.nix
     ../../modules/nixos/services/fwupd.nix
   ];
 
