@@ -18,6 +18,7 @@
     ../../modules/nixos/core/nix-settings.nix
     ../../modules/nixos/desktop/audio.nix
     ../../modules/nixos/hardware/amd-gpu.nix
+    ../../modules/nixos/hardware/bluetooth.nix
     ../../modules/nixos/hardware/intel-cpu.nix
   ];
 
