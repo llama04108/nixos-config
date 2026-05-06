@@ -39,6 +39,12 @@
     # Slicer (closed-source, Flathub-only) and as a fallback for
     # Bambu Studio if the native package's cloud login fails.
     nix-flatpak.url = "github:gmodena/nix-flatpak";
+
+    # nvf: declarative version of neovim
+    nvf = {
+      url = "github:notashelf/nvf";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   # ─── Outputs ─────────────────────────────────────────────────────────

@@ -74,7 +74,6 @@
 
     # System utilities
     wget
-    neovim
     fastfetch
     pciutils                       # lspci for hardware inspection
     vulkan-tools                   # vulkaninfo to verify GPU stack
