@@ -17,6 +17,7 @@
     ./hardware-configuration.nix
     ../../modules/nixos/core/boot/uefi.nix
     ../../modules/nixos/profiles/workstation.nix
+    ../../modules/nixos/services/btrfs-maintenance.nix
   ];
 
   # ─── Identity ───────────────────────────────────────────────────────
