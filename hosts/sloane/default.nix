@@ -18,6 +18,7 @@
     ../../modules/nixos/core/boot/uefi.nix
     ../../modules/nixos/profiles/workstation.nix
     ../../modules/nixos/services/btrfs-maintenance.nix
+    ../../modules/nixos/home-manager.nix
   ];
 
   # ─── Identity ───────────────────────────────────────────────────────
