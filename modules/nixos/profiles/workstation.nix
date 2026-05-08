@@ -2,7 +2,7 @@
 #
 # Workstation profile for sloane: gaming, music production
 # (Bitwig + LinnStrument + Kontakt-via-yabridge), 3D printing
-# slicers, CAD, Blender, electronics.
+# slicers, CAD, electronics.
 #
 # Composes the building-block modules and adds the user-facing
 # applications. Daemons and hardware concerns live in their own
@@ -31,9 +31,12 @@
   ];
 
   # ─── Module options ─────────────────────────────────────────────────
+  # ROCm disabled until Blender returns or other GPU-compute use shows up.
+  # AMD GPU graphics (Mesa/RADV/32-bit) stay enabled — that's the base
+  # config of the amd-gpu module, this just controls the ROCm overlay.
   local.audio.lowLatency.enable        = true;
   local.networking.gamingTweaks.enable = true;
-  local.hardware.amdGpu.rocm.enable    = true;
+  local.hardware.amdGpu.rocm.enable    = false;
 
   # ─── Steam ──────────────────────────────────────────────────────────
   # Steam needs to be a NixOS program (not just a package) so NixOS
@@ -66,8 +69,33 @@
   programs.fish.enable = true;
 
   # ─── Allow unfree packages ──────────────────────────────────────────
-  # Bitwig, Discord/vesktop, Steam, Bambu Studio, etc. are non-free.
+  # Bitwig, vesktop, Steam, Bambu Studio, Brave (BSD-3 with non-free
+  # Widevine for DRM), etc. are non-free.
   nixpkgs.config.allowUnfree = true;
+
+  # ─── Brave policies (de-bloat) ──────────────────────────────────────
+  # Chrome Enterprise policies dropped into /etc/brave/policies/managed/
+  # to disable Brave's bundled crypto/AI/VPN/news/tor features.
+  # We keep Brave Sync enabled (the reason we want Brave alongside
+  # Helium — its sync infrastructure works for cross-device tabs).
+  # DnsOverHttpsMode = "off" defers DNS to the OS resolver, which goes
+  # to the router and from there to NextDNS — keeping NextDNS in the
+  # filtering path rather than letting Brave bypass it via DoH.
+  #
+  # Verify policies are applied after install: brave://policy/
+  environment.etc."brave/policies/managed/policies.json".text = builtins.toJSON {
+    BraveRewardsDisabled       = true;
+    BraveWalletDisabled        = true;
+    BraveVPNDisabled           = true;
+    BraveAIChatEnabled         = false;
+    BraveNewsDisabled          = true;
+    BraveTalkDisabled          = true;
+    TorDisabled                = true;
+    BraveP3AEnabled            = false;
+    BraveStatsPingEnabled      = false;
+    BraveWebDiscoveryEnabled   = false;
+    DnsOverHttpsMode           = "off";
+  };
 
   # ─── User-facing applications ───────────────────────────────────────
   environment.systemPackages = with pkgs; [
@@ -77,34 +105,35 @@
     fastfetch
     pciutils                       # lspci for hardware inspection
     vulkan-tools                   # vulkaninfo to verify GPU stack
-    clinfo                         # OpenCL inspection (Blender HIP debug)
+    clinfo                         # OpenCL inspection
+    rclone                         # Proton Drive sync (configured manually)
 
     # System / GPU monitoring
     btop                           # all-in-one TUI system monitor
     amdgpu_top                     # AMD-specific GPU detail
 
     # Browsers
-    librewolf
+    librewolf                      # primary browser (Firefox-based)
+    brave                          # Chromium-based; debloated via policies above
 
     # Terminal
     ghostty
 
     # File management
     nautilus                       # GUI file manager
-    yazi                           # TUI file manager
     file-roller                    # archive GUI for nautilus right-click
 
-    # Image viewer
-    loupe
+    # Image viewer / editor
+    loupe                          # GTK4 viewer; handles crop/rotate/flip
+    pinta                          # simple raster editor (resize, brightness, paint)
 
     # PDF viewer
     evince
 
     # Video
-    vlc
-    mpv
+    showtime                       # GNOME video player (GStreamer)
 
-    # Screenshots (Niri keybindings will invoke these)
+    # Screenshots
     grim                           # Wayland screen capture
     slurp                          # region selector
     wl-clipboard                   # Wayland clipboard CLI
@@ -118,28 +147,20 @@
     wineWow64Packages.stable       # 32+64-bit Wine
 
     # Audio: routing and control
-    qpwgraph                       # PipeWire patchbay
-    pavucontrol                    # per-app volume
-
-    # MIDI
-    kmidimon                       # MIDI traffic monitor (LinnStrument)
+    crosspipe                      # GTK4/Libadwaita PipeWire patchbay (helvum successor)
+    pwvucontrol                    # GTK4 PipeWire-native per-app volume
 
     # Audio: instruments and processing
     surge-xt                       # synth (used with LinnStrument)
     zam-plugins                    # mixing/mastering plugin set
 
-    # Audio: utilities and bridging
-    ffmpeg
-    sox
+    # Audio: production
     bitwig-studio
     yabridge                       # Windows VST → Linux bridge
     yabridgectl                    # yabridge management CLI
 
     # 3D / Design / Creative
-    blender                        # GPU-accelerated via ROCm
-    gimp
-    krita
-    freecad
+    freecad                        # parametric CAD
 
     # Electronics
     arduino-ide
