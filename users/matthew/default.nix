@@ -15,6 +15,7 @@
   # Import home-manager modules here.
   imports = [
     inputs.nvf.homeManagerModules.default
+    ./niri.nix
   ];
 
   # ─── Identity ───────────────────────────────────────────────────────
@@ -46,7 +47,8 @@
   # anything that needs system integration (steam, drivers, services)
   # stays system-level.
   home.packages = with pkgs; [
-    # nothing here yet — will fill in as needed
+    playerctl       # MPRIS media control for keybindings
+    brightnessctl   # backlight control (laptop relevance, harmless on desktop)
   ];
 
   # ─── Fish ───────────────────────────────────────────────────────────
