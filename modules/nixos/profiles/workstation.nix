@@ -22,6 +22,7 @@
     ../core/nix-settings.nix
     ../desktop/audio.nix
     ../desktop/fonts.nix
+    ../desktop/login-manager.nix
     ../desktop/printing.nix
     ../hardware/amd-gpu.nix
     ../hardware/bluetooth.nix
