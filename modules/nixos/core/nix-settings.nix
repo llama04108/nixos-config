@@ -15,7 +15,25 @@
     # Both are still gated behind the experimental flag despite being
     # the de facto standard since 2021. Likely to become default
     # eventually.
-    settings.experimental-features = [ "nix-command" "flakes" ];
+    settings = {
+      experimental-features = [ "nix-command" "flakes" ];
+
+      # ─── Store optimization ───────────────────────────────────────
+      # Hardlinks identical files in the store. Saves significant
+      # disk space (often 20-40% on a busy store) at the cost of some
+      # CPU during builds. Worth it on any machine with >100GB store.
+      auto-optimise-store = true;
+
+      # ─── Binary caches ────────────────────────────────────────────
+      # cache.nixos.org is implicit. Adding noctalia's cache avoids
+      # compiling Noctalia from source — its build is non-trivial.
+      extra-substituters = [
+        "https://noctalia.cachix.org"
+      ];
+      extra-trusted-public-keys = [
+        "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
+      ];
+    };
 
     # ─── Garbage collection ─────────────────────────────────────────
     # Nix never deletes old store paths automatically — every NixOS
@@ -27,11 +45,5 @@
       dates     = "weekly";
       options   = "--delete-older-than 30d";
     };
-
-    # ─── Store optimization ─────────────────────────────────────────
-    # Hardlinks identical files in the store. Saves significant
-    # disk space (often 20-40% on a busy store) at the cost of some
-    # CPU during builds. Worth it on any machine with >100GB store.
-    settings.auto-optimise-store = true;
   };
 }

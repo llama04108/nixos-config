@@ -98,6 +98,12 @@
     DnsOverHttpsMode           = "off";
   };
 
+  # ─── PAM for Noctalia lock screen ───────────────────────────────────
+  # Noctalia's lock screen authenticates via PAM. The package doesn't
+  # install a PAM service entry — we provide one here. Empty config
+  # body uses NixOS's default PAM template (login-equivalent auth).
+  security.pam.services.noctalia-shell = {};
+
   # ─── User-facing applications ───────────────────────────────────────
   environment.systemPackages = with pkgs; [
 

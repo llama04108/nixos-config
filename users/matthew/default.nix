@@ -49,6 +49,9 @@
   home.packages = with pkgs; [
     playerctl       # MPRIS media control for keybindings
     brightnessctl   # backlight control (laptop relevance, harmless on desktop)
+    noctalia-shell  # Wayland shell. Settings managed imperatively
+                    # via Noctalia's GUI; periodic snapshots stored in
+                    # users/matthew/noctalia/ for reference.
   ];
 
   # ─── Fish ───────────────────────────────────────────────────────────
