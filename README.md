@@ -155,7 +155,7 @@ mount -o subvol=@swap,noatime,ssd                     /dev/mapper/cryptroot /mnt
 mount /dev/nvme0n1p1 /mnt/boot
 
 # Mount the existing /games (preserve from previous install)
-mount /dev/nvme1n1p1 /mnt/games  # adjust device path if different
+mount /dev/sda1 /mnt/games  # adjust device path if different
 ```
 
 ### 6. Create swapfile
