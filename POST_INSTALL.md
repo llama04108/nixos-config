@@ -430,25 +430,3 @@ them to Nix without thinking through it:
 Some of these *could* be made declarative with effort (sops-nix for
 secrets, home-manager modules for browser configs). Worth doing only
 if the maintenance cost is genuinely paying off.
-
-That's POST_INSTALL.md.
-Validate and commit
-bash
-
-git add POST_INSTALL.md
-nix flake check
-git commit -m "docs: add POST_INSTALL with imperative-steps walkthrough
-
-Lists the post-rebuild work that can't be declared in Nix:
-- Essential: rotate password, set up SSH keys, fix Noctalia
-  syncGsettings, switch ssh to key-only
-- Service config: rclone (Proton Drive), Bitwig license,
-  printer setup, Brave policy verification
-- Personalization: real wallpaper, Noctalia tweaks, Zed
-- Optional: Steam Proton-GE, yabridge, Standard Notes,
-  ProtonVPN
-- Maintenance: flake updates, theme experimentation,
-  Noctalia snapshot workflow
-- Troubleshooting common issues
-- Explicit list of what's intentionally NOT declarative"
-git push
