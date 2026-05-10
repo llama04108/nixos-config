@@ -30,6 +30,7 @@
     ../hardware/intel-cpu.nix
     ../services/flatpak.nix
     ../services/fwupd.nix
+    ../services/openssh.nix
   ];
 
   # ─── Module options ─────────────────────────────────────────────────

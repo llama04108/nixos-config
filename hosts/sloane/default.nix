@@ -44,6 +44,13 @@
     description = "Matthew";
     shell = pkgs.fish;
     extraGroups = [ "wheel" "networkmanager" "audio" "scanner" "lp" ];
+
+    # Initial password for first login. CHANGE IMMEDIATELY after first
+    # successful login via `passwd`. This value is committed to git
+    # and visible to anyone who can read the repo, so treat it as
+    # already-compromised. The passwd command rotates to a real
+    # password stored only in /etc/shadow on the actual machine.
+    initialPassword = "changeme";
   };
 
   # ─── State version ──────────────────────────────────────────────────
