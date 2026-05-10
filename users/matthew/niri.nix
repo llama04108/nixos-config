@@ -48,32 +48,28 @@
       ];
       default-column-width.proportion = 0.50000;
 
+      # Focus ring colors are set by Stylix via niri-flake's target.
+      # We just enable the ring; colors come from the theme.
       focus-ring = {
         enable = true;
         width = 4;
-        active.color   = "#cba6f7";   # Catppuccin Mocha mauve
-        inactive.color = "#505050";
       };
 
+      # Border off; just the focus ring for cleaner look.
       border = {
         enable = false;
         width = 4;
-        active.color   = "#ffc87f";
-        inactive.color = "#505050";
-        urgent.color   = "#9b0000";
       };
 
       shadow = {
-        enable = false;   # was off in your config; keep
+        enable = false;
         softness = 30;
         spread = 5;
         offset = { x = 0; y = 5; };
         color = "#0007";
       };
 
-      struts = {
-        # All zero — no extra outer gaps beyond layer-shell panels.
-      };
+      struts = { };
     };
 
     # ─── Spawn at startup ─────────────────────────────────────────────

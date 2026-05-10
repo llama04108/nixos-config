@@ -35,6 +35,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # stylix: NixOS theme management via home-manager.
+    stylix = {
+      url = "github:danth/stylix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # nix-flatpak: declarative flatpak management. Used for Lychee
     # Slicer (closed-source, Flathub-only) and as a fallback for
     # Bambu Studio if the native package's cloud login fails.
@@ -52,7 +58,7 @@
   # arguments. The `@inputs` part binds the entire arg set to the name
   # `inputs`, which we pass through to modules via specialArgs so
   # modules can reach Niri's and Noctalia's modules from inputs.<name>.
-  outputs = { self, nixpkgs, home-manager, niri, noctalia, nix-flatpak, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, niri, noctalia, nix-flatpak, stylix, ... }@inputs:
   let
     # Shared system architecture. All five hosts are x86_64-linux.
     # If we ever add an ARM box, we'd lift this out per-host.
@@ -70,6 +76,7 @@
           home-manager.nixosModules.home-manager
           nix-flatpak.nixosModules.nix-flatpak
           niri.nixosModules.niri
+          stylix.nixosModules.stylix
         ] ++ extraModules;
       };
   in {

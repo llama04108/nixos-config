@@ -145,8 +145,6 @@
       # colorscheme set during the theming pass.
       theme = {
         enable = true;
-        name = "catppuccin";
-        style = "mocha";
       };
 
       # ─ Statusline ─

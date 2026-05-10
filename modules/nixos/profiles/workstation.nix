@@ -24,6 +24,7 @@
     ../desktop/fonts.nix
     ../desktop/login-manager.nix
     ../desktop/printing.nix
+    ../desktop/theming.nix
     ../hardware/amd-gpu.nix
     ../hardware/bluetooth.nix
     ../hardware/intel-cpu.nix
