@@ -71,6 +71,14 @@
   # plugin manager) goes in home-manager when we wire that up.
   programs.fish.enable = true;
 
+  # ─── Memory pressure relief ─────────────────────────────────────────
+  # zram compresses inactive memory pages in RAM rather than writing
+  # them to disk. Faster than disk swap, zero disk wear.
+  # Default size = 50% of RAM (16GB on this 32GB system) — plenty.
+  # Pairs with the small (8GB) disk swap defined in
+  # hardware-configuration.nix as an OOM safety net.
+  zramSwap.enable = true;
+
   # ─── Allow unfree packages ──────────────────────────────────────────
   # Bitwig, vesktop, Steam, Bambu Studio, Brave (BSD-3 with non-free
   # Widevine for DRM), etc. are non-free.
