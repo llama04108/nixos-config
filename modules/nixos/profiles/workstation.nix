@@ -138,7 +138,7 @@
 
     # Browsers
     librewolf                      # primary browser (Firefox-based)
-    brave                          # Chromium-based; debloated via policies above
+    helium                         # Chromium-based
 
     # Terminal
     ghostty
@@ -147,18 +147,19 @@
     zed-editor                     # primary GUI editor (nvf is secondary)
 
     # File management
-    nautilus                       # GUI file manager
-    file-roller                    # archive GUI for nautilus right-click
+    kdePackages.dolphin            # KDE file manager (best-in-class features)
+    kdePackages.kio-extras         # network protocols for Dolphin
+    kdePackages.ark                # archive manager (integrates with Dolphin)
 
     # Image viewer / editor
-    loupe                          # GTK4 viewer; handles crop/rotate/flip
-    pinta                          # simple raster editor (resize, brightness, paint)
+    kdePackages.gwenview           # image viewer + batch operations
+    pinta                          # keep for simple raster editing (resize, paint)
 
     # PDF viewer
-    evince
+    kdePackages.okular             # PDF viewer with annotation support
 
     # Video
-    showtime                       # GNOME video player (GStreamer)
+    haruna                         # KDE/mpv-based video player
 
     # Screenshots
     grim                           # Wayland screen capture
@@ -199,7 +200,7 @@
 
     # Productivity
     standardnotes
-    qalculate-gtk
+    qalculate-qt
 
     # Proton suite
     protonmail-desktop
