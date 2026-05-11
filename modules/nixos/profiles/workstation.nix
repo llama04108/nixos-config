@@ -143,6 +143,9 @@
     # Terminal
     ghostty
 
+    # Editors
+    zed-editor                     # primary GUI editor (nvf is secondary)
+
     # File management
     nautilus                       # GUI file manager
     file-roller                    # archive GUI for nautilus right-click
