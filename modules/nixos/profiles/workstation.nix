@@ -71,6 +71,13 @@
   # plugin manager) goes in home-manager when we wire that up.
   programs.fish.enable = true;
 
+  # ─── Niri compositor ────────────────────────────────────────────────
+  # Installs niri, registers it as a Wayland session, and provides the
+  # programs.niri.* options used by users/matthew/niri.nix. Without this
+  # enable line, niri-flake provides the config schema but doesn't
+  # install niri itself.
+  programs.niri.enable = true;
+
   # ─── Memory pressure relief ─────────────────────────────────────────
   # zram compresses inactive memory pages in RAM rather than writing
   # them to disk. Faster than disk swap, zero disk wear.
