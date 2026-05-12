@@ -30,6 +30,10 @@
   # will use linuxPackages_lts instead.
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
+  # ─── Helium ─────────────────────────────────────────────────────────
+  # Make Helium browser available as pkgs.helium
+  nixpkgs.overlays = [ inputs.helium.overlays.default ];
+
   # ─── User ───────────────────────────────────────────────────────────
   # Inline for now; will move to users/matthew/ with home-manager
   # integration soon.
