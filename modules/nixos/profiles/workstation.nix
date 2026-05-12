@@ -101,19 +101,19 @@
   # filtering path rather than letting Brave bypass it via DoH.
   #
   # Verify policies are applied after install: brave://policy/
-  environment.etc."brave/policies/managed/policies.json".text = builtins.toJSON {
-    BraveRewardsDisabled       = true;
-    BraveWalletDisabled        = true;
-    BraveVPNDisabled           = true;
-    BraveAIChatEnabled         = false;
-    BraveNewsDisabled          = true;
-    BraveTalkDisabled          = true;
-    TorDisabled                = true;
-    BraveP3AEnabled            = false;
-    BraveStatsPingEnabled      = false;
-    BraveWebDiscoveryEnabled   = false;
-    DnsOverHttpsMode           = "off";
-  };
+  # environment.etc."brave/policies/managed/policies.json".text = builtins.toJSON {
+  #   BraveRewardsDisabled       = true;
+  #   BraveWalletDisabled        = true;
+  #   BraveVPNDisabled           = true;
+  #   BraveAIChatEnabled         = false;
+  #   BraveNewsDisabled          = true;
+  #   BraveTalkDisabled          = true;
+  #   TorDisabled                = true;
+  #   BraveP3AEnabled            = false;
+  #   BraveStatsPingEnabled      = false;
+  #   BraveWebDiscoveryEnabled   = false;
+  #   DnsOverHttpsMode           = "off";
+  # };
 
   # ─── PAM for Noctalia lock screen ───────────────────────────────────
   # Noctalia's lock screen authenticates via PAM. The package doesn't
@@ -139,6 +139,7 @@
     # Browsers
     librewolf                      # primary browser (Firefox-based)
     helium                         # Chromium-based
+    # brave                        # Chromium-based
 
     # Terminal
     ghostty
