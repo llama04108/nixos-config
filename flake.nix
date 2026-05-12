@@ -28,6 +28,13 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Helium browser: privacy-focused Chromium fork. Installed alongside
+    # LibreWolf as a secondary browser when Chromium-engine is needed.
+    helium = {
+      url = "github:oxcl/nix-flake-helium-browser";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # noctalia: Quickshell-based desktop shell. Provides home-manager
     # module for declarative settings.json generation.
     noctalia = {
@@ -58,7 +65,7 @@
   # arguments. The `@inputs` part binds the entire arg set to the name
   # `inputs`, which we pass through to modules via specialArgs so
   # modules can reach Niri's and Noctalia's modules from inputs.<name>.
-  outputs = { self, nixpkgs, home-manager, niri, noctalia, nix-flatpak, stylix, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, niri, noctalia, nix-flatpak, stylix, helium, nvf, ... }@inputs:
   let
     # Shared system architecture. All five hosts are x86_64-linux.
     # If we ever add an ARM box, we'd lift this out per-host.
